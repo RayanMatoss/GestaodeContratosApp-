@@ -1,30 +1,48 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, FileText, Bell, User } from "lucide-react";
+import { Plus } from "lucide-react";
 import { ContractDialog } from "@/components/ContractDialog";
 import { ContractList } from "@/components/ContractList";
 import { DashboardStats } from "@/components/DashboardStats";
 import { AlertsList } from "@/components/AlertsList";
+import { Header } from "@/components/Header";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [isContractDialogOpen, setIsContractDialogOpen] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Gestão de Contratos
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Gerencie contratos públicos, notas fiscais e acompanhe prazos
-            </p>
-          </div>
+        <Header />
+
+        {/* Action Button */}
+        <div className="flex justify-end mb-8">
           <Button 
             onClick={() => setIsContractDialogOpen(true)}
             className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg"
